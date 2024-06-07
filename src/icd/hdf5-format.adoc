@@ -652,6 +652,14 @@ Now you can start navigating through the data by clicking and unfolding items in
 In *Screenshot 4* I have further expanded the `data` group and the tree view now shows the individual SpaceWire data packets. If you click on one of them, the content of the packet is printed in different formats and also the header is printed in a human readable format. The parameter 'w' is the number of pixels in the data part of the SpW packet. As said above, we have 7 rows per packet -> 16065 / 7 = 2295, which is the number op pixels per row. This view is mainly there for debugging and can change in the future.
 
 
+The `hdf5_ui` is a Qt5 tool and needs a graphics display server to run. Sometime however you just need to have a quick look at your HDF5 file or you are in an ssh session and do not have the opportunity to start a GUI. In that case, you can use the `h5tui` tool provided by the CGSE. This is a Text User Interface  (TUI) that allows you to inspect and navigate in an HDF5 file, even show an image of your science data with zoom and pan functionality. You can start this program in a terminal (also in a ssh session) as follows, e.g.:
+
+----
+$ h5tui 20240417_IAS_N-FEE_SPW_02303.hdf5
+----
+
+image::../images/h5tui-01.png[width=80%,align=center]
+
 ---
 
 TBW
