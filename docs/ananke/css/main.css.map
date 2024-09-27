@@ -1,7 +1,7 @@
 {
 	"version": 3,
 	"file": "main.css",
-	"sourceRoot": "/Users/rik/git/plato-cgse-doc/hugo",
+	"sourceRoot": "/Users/rik/Documents/PyCharmProjects/plato-cgse-doc/hugo",
 	"sources": [
 		"ananke/css/main.css"
 	],
