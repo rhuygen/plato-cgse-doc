@@ -50,3 +50,12 @@ for folder, name in [
 rich.print("Updating the HUGO site..")
 subprocess.run(["hugo"], cwd=HERE / "hugo")
 rich.print("done.")
+
+rich.print(textwrap.dedent(
+    """
+    At this point, you should fix the links for the documents in the top-level `index.html` fie. 
+    Remove the `../../` for all docs, i.e. 10 replacements. 
+    
+    Eventually, I will automate this in this script.
+    """
+))
