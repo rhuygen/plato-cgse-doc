@@ -553,8 +553,8 @@ body.book #toc,body.book #preamble,body.book h1.sect0,body.book .sect1>h2{page-b
 <h1>Common-EGSE : Interface Control Document</h1>
 <div class="details">
 <span id="author" class="author">Rik Huygen</span><br>
-<span id="revnumber">version 0.6,</span>
-<span id="revdate">11/09/2024</span>
+<span id="revnumber">version 0.7,</span>
+<span id="revdate">29/09/2024</span>
 </div>
 <div id="toc" class="toc2">
 <div id="toctitle">Table of Contents</div>
@@ -618,6 +618,16 @@ body.book #toc,body.book #preamble,body.book h1.sect0,body.book .sect1>h2{page-b
 <div class="sectionbody">
 <div class="dlist">
 <dl>
+<dt class="hdlist1">29/09/2024 — v0.7</dt>
+<dd>
+<div class="ulist">
+<ul>
+<li>
+<p>Updated the section on the format version  of the HDF5 files, see <a href="#hdf5-format-version">Section 4.2.1</a>.</p>
+</li>
+</ul>
+</div>
+</dd>
 <dt class="hdlist1">11/09/2024 — v0.6</dt>
 <dd>
 <div class="ulist">
@@ -1180,6 +1190,44 @@ The following extensions can be included in the FITS files:</p>
 </div>
 </div>
 <div class="paragraph">
+<p>The <code>format_version</code> for the N-FEE HDF5 files is set in the function <code>save_format_version()</code> in the <code>egse.dpu.<em>init</em>.py</code>. For the F-FEE HDF5 files, the <code>format_version</code> is set in the method <code>dump_format_version()</code> of the Data Dumper. As of this writing, the history is as follows:</p>
+</div>
+<div id="_tabs_4" class="openblock tabs is-loading">
+<div class="content">
+<div class="ulist tablist">
+<ul>
+<li id="_tabs_4_n_fee" class="tab">
+<p>N-FEE</p>
+</li>
+<li id="_tabs_4_f_fee" class="tab">
+<p>F-FEE</p>
+</li>
+</ul>
+</div>
+<div id="_tabs_4_n_fee--panel" class="tabpanel" aria-labelledby="_tabs_4_n_fee">
+<div class="listingblock">
+<div class="content">
+<pre># 2.0 - introduced the format_version
+# 2.1 - Added obsid as a dataset to the HDF5 file
+# 2.2 - Multiple commands can now be saved under the same frame number
+# 2.3 - introduced /dpu/num_cycles attribute
+# 2.4 - introduced /dpu/slicing_num_cycles attribute
+# 2.5 - introduced /{frame number}/hk_data dataset
+# 2.6 - introduced /fee/type attribute (type can be N-FEE or F-FEE)</pre>
+</div>
+</div>
+</div>
+<div id="_tabs_4_f_fee--panel" class="tabpanel" aria-labelledby="_tabs_4_f_fee">
+<div class="listingblock">
+<div class="content">
+<pre># 3.0 – introduced the format_version for F-CAM
+# 3.1 – /commands now have a timestamp attribute, next to the duration</pre>
+</div>
+</div>
+</div>
+</div>
+</div>
+<div class="paragraph">
 <p>Since the format and content of the N-FEE and F-FEE HDF5 files are quite different, we have split the description in two sections below. We will go through the different groups, datasets, and attributes of each of these files, explain how to extract the information from the HDF5 file and what the content is. Since some of you are more used to the <code>h5py</code> package we will try to extract and visualize the data using both the <code>egse.h5</code> as the <code>h5py</code> package. A third visualisation is with the <code>h5tui</code> app, which is a generic HDF5 viewer (a terminal app) that was developed for this project. We will use that with the F-FEE HDF5 files.</p>
 </div>
 </div>
@@ -1191,19 +1239,19 @@ The following extensions can be included in the FITS files:</p>
 <div class="paragraph">
 <p>Let&#8217;s take an example file from IAS taken on 7th February 2023. The file is loaded with the <code>h5.get_file()</code> function and we can visualize the top level structure as follows:</p>
 </div>
-<div id="_tabs_4" class="openblock tabs is-loading">
+<div id="_tabs_5" class="openblock tabs is-loading">
 <div class="content">
 <div class="ulist tablist">
 <ul>
-<li id="_tabs_4_egse_h5" class="tab">
+<li id="_tabs_5_egse_h5" class="tab">
 <p>egse.h5</p>
 </li>
-<li id="_tabs_4_h5py" class="tab">
+<li id="_tabs_5_h5py" class="tab">
 <p>h5py</p>
 </li>
 </ul>
 </div>
-<div id="_tabs_4_egse_h5--panel" class="tabpanel" aria-labelledby="_tabs_4_egse_h5">
+<div id="_tabs_5_egse_h5--panel" class="tabpanel" aria-labelledby="_tabs_5_egse_h5">
 <div class="listingblock">
 <div class="content">
 <pre>&gt;&gt;&gt; h5_fd = h5.get_file("20240329_CSL2_N-FEE_SPW_00017.hdf5")
@@ -1222,7 +1270,7 @@ Total size of attributes: 0 bytes</pre>
 </div>
 </div>
 </div>
-<div id="_tabs_4_h5py--panel" class="tabpanel" aria-labelledby="_tabs_4_h5py">
+<div id="_tabs_5_h5py--panel" class="tabpanel" aria-labelledby="_tabs_5_h5py">
 <div class="listingblock">
 <div class="content">
 <pre>&gt;&gt;&gt; h5_fd = h5py.File("20230207_IAS_N-FEE_SPW_06174.hdf5")
@@ -1235,43 +1283,6 @@ Total size of attributes: 0 bytes</pre>
 </div>
 <div class="paragraph">
 <p>We can see that there are five top-level groups and four datasets. This is data taken in external sync mode, so we have four readouts per cycle. The data from each readout is in the groups 0, 1, 2, and 3. These numbers correspond to the frame number. Each of these groups has the following structure:</p>
-</div>
-<div id="_tabs_5" class="openblock tabs is-loading">
-<div class="content">
-<div class="ulist tablist">
-<ul>
-<li id="_tabs_5_egse_h5" class="tab">
-<p>egse.h5</p>
-</li>
-<li id="_tabs_5_h5py" class="tab">
-<p>h5py</p>
-</li>
-</ul>
-</div>
-<div id="_tabs_5_egse_h5--panel" class="tabpanel" aria-labelledby="_tabs_5_egse_h5">
-<div class="listingblock">
-<div class="content">
-<pre>&gt;&gt;&gt; h5.show_groups(h5_fd["/0"], max_level=1)
-[G] data
-[D] hk (266 bytes)
-[D] hk_data (256 bytes)
-[D] timecode (104 bytes)
-Total size of Group = 39.899 MB</pre>
-</div>
-</div>
-</div>
-<div id="_tabs_5_h5py--panel" class="tabpanel" aria-labelledby="_tabs_5_h5py">
-<div class="listingblock">
-<div class="content">
-<pre>&gt;&gt;&gt; [x for x in h5_fd["/0"]]
-['data', 'hk', 'hk_data', 'timecode']</pre>
-</div>
-</div>
-</div>
-</div>
-</div>
-<div class="paragraph">
-<p>The <code>data</code> group contains all the SpaceWire packets that have image data, i.e. normal data packets and overscan packets. The <code>data</code> group also has the following attributes that are used to decode the SpaceWire packets into image data arrays. We will describe the <code>data</code> groups into more detail later in this section.</p>
 </div>
 <div id="_tabs_6" class="openblock tabs is-loading">
 <div class="content">
@@ -1286,6 +1297,43 @@ Total size of Group = 39.899 MB</pre>
 </ul>
 </div>
 <div id="_tabs_6_egse_h5--panel" class="tabpanel" aria-labelledby="_tabs_6_egse_h5">
+<div class="listingblock">
+<div class="content">
+<pre>&gt;&gt;&gt; h5.show_groups(h5_fd["/0"], max_level=1)
+[G] data
+[D] hk (266 bytes)
+[D] hk_data (256 bytes)
+[D] timecode (104 bytes)
+Total size of Group = 39.899 MB</pre>
+</div>
+</div>
+</div>
+<div id="_tabs_6_h5py--panel" class="tabpanel" aria-labelledby="_tabs_6_h5py">
+<div class="listingblock">
+<div class="content">
+<pre>&gt;&gt;&gt; [x for x in h5_fd["/0"]]
+['data', 'hk', 'hk_data', 'timecode']</pre>
+</div>
+</div>
+</div>
+</div>
+</div>
+<div class="paragraph">
+<p>The <code>data</code> group contains all the SpaceWire packets that have image data, i.e. normal data packets and overscan packets. The <code>data</code> group also has the following attributes that are used to decode the SpaceWire packets into image data arrays. We will describe the <code>data</code> groups into more detail later in this section.</p>
+</div>
+<div id="_tabs_7" class="openblock tabs is-loading">
+<div class="content">
+<div class="ulist tablist">
+<ul>
+<li id="_tabs_7_egse_h5" class="tab">
+<p>egse.h5</p>
+</li>
+<li id="_tabs_7_h5py" class="tab">
+<p>h5py</p>
+</li>
+</ul>
+</div>
+<div id="_tabs_7_egse_h5--panel" class="tabpanel" aria-labelledby="_tabs_7_egse_h5">
 <div class="listingblock">
 <div class="content">
 <pre>&gt;&gt;&gt; h5.show_attributes(h5_fd["/0/data"])
@@ -1305,7 +1353,7 @@ Total size of attributes: 384 bytes</pre>
 </div>
 </div>
 </div>
-<div id="_tabs_6_h5py--panel" class="tabpanel" aria-labelledby="_tabs_6_h5py">
+<div id="_tabs_7_h5py--panel" class="tabpanel" aria-labelledby="_tabs_7_h5py">
 <div class="listingblock">
 <div class="content">
 <pre>&gt;&gt;&gt; [x for x in h5_fd["/0/data"].attrs]
@@ -1331,19 +1379,19 @@ Total size of attributes: 384 bytes</pre>
 <div class="paragraph">
 <p>The two datasets in group <code>'/0'</code> contain the timecode and the housekeeping information that is sent on every sync pulse. The <code>timecode</code> dataset contains the timecode itself and the timestamp when this timecode was received by the DPU Processor. Remember the timecode is an integer from 0 to 63. The <code>timecode</code> dataset is an array with one integer element, the timestamp is an attribute of the <code>timecode</code> dataset. The <code>timecode</code> dataset and the timestamp can be visualised as follows.</p>
 </div>
-<div id="_tabs_7" class="openblock tabs is-loading">
+<div id="_tabs_8" class="openblock tabs is-loading">
 <div class="content">
 <div class="ulist tablist">
 <ul>
-<li id="_tabs_7_egse_h5" class="tab">
+<li id="_tabs_8_egse_h5" class="tab">
 <p>egse.h5</p>
 </li>
-<li id="_tabs_7_h5py" class="tab">
+<li id="_tabs_8_h5py" class="tab">
 <p>h5py</p>
 </li>
 </ul>
 </div>
-<div id="_tabs_7_egse_h5--panel" class="tabpanel" aria-labelledby="_tabs_7_egse_h5">
+<div id="_tabs_8_egse_h5--panel" class="tabpanel" aria-labelledby="_tabs_8_egse_h5">
 <div class="listingblock">
 <div class="content">
 <pre>&gt;&gt;&gt; h5.get_data(h5_fd["/0/timecode"])
@@ -1353,7 +1401,7 @@ array(53)
 </div>
 </div>
 </div>
-<div id="_tabs_7_h5py--panel" class="tabpanel" aria-labelledby="_tabs_7_h5py">
+<div id="_tabs_8_h5py--panel" class="tabpanel" aria-labelledby="_tabs_8_h5py">
 <div class="listingblock">
 <div class="content">
 <pre>&gt;&gt;&gt; h5_fd["/0/timecode"][()]
@@ -1368,19 +1416,19 @@ array(53)
 <div class="paragraph">
 <p>The raw content of the <code>hk</code> dataset can be shown as follows. The <code>hk</code> dataset has no attributes currently.</p>
 </div>
-<div id="_tabs_8" class="openblock tabs is-loading">
+<div id="_tabs_9" class="openblock tabs is-loading">
 <div class="content">
 <div class="ulist tablist">
 <ul>
-<li id="_tabs_8_egse_h5" class="tab">
+<li id="_tabs_9_egse_h5" class="tab">
 <p>egse.h5</p>
 </li>
-<li id="_tabs_8_h5py" class="tab">
+<li id="_tabs_9_h5py" class="tab">
 <p>h5py</p>
 </li>
 </ul>
 </div>
-<div id="_tabs_8_egse_h5--panel" class="tabpanel" aria-labelledby="_tabs_8_egse_h5">
+<div id="_tabs_9_egse_h5--panel" class="tabpanel" aria-labelledby="_tabs_9_egse_h5">
 <div class="listingblock">
 <div class="content">
 <pre>&gt;&gt;&gt; h5.get_data(h5_fd["/0/hk"])
@@ -1399,7 +1447,7 @@ array([ 80, 240,   0, 144,   5, 130,  24,  29,   0,   0, 128,   0, 128,
 </div>
 </div>
 </div>
-<div id="_tabs_8_h5py--panel" class="tabpanel" aria-labelledby="_tabs_8_h5py">
+<div id="_tabs_9_h5py--panel" class="tabpanel" aria-labelledby="_tabs_9_h5py">
 <div class="listingblock">
 <div class="content">
 <pre>&gt;&gt;&gt; h5_fd["/0/hk"][()]
@@ -1438,19 +1486,19 @@ So, why do we need this additional <code>hk_data</code>? This was a request by E
 <div class="paragraph">
 <p>The CGSE provides a module to inspect and work with PLATO SpaceWire packets. The above housekeeping packet can be inspected using the <code>HousekeepingPacket</code> class from the <code>egse.spw</code> package:</p>
 </div>
-<div id="_tabs_9" class="openblock tabs is-loading">
+<div id="_tabs_10" class="openblock tabs is-loading">
 <div class="content">
 <div class="ulist tablist">
 <ul>
-<li id="_tabs_9_egse_h5" class="tab">
+<li id="_tabs_10_egse_h5" class="tab">
 <p>egse.h5</p>
 </li>
-<li id="_tabs_9_h5py" class="tab">
+<li id="_tabs_10_h5py" class="tab">
 <p>h5py</p>
 </li>
 </ul>
 </div>
-<div id="_tabs_9_egse_h5--panel" class="tabpanel" aria-labelledby="_tabs_9_egse_h5">
+<div id="_tabs_10_egse_h5--panel" class="tabpanel" aria-labelledby="_tabs_10_egse_h5">
 <div class="listingblock">
 <div class="content">
 <pre class="nowrap">&gt;&gt;&gt; from egse.spw import HousekeepingPacket
@@ -1471,7 +1519,7 @@ Type:HOUSEKEEPING_DATA
 </div>
 </div>
 </div>
-<div id="_tabs_9_h5py--panel" class="tabpanel" aria-labelledby="_tabs_9_h5py">
+<div id="_tabs_10_h5py--panel" class="tabpanel" aria-labelledby="_tabs_10_h5py">
 <div class="paragraph">
 <p>In this case only the retrieving of the <code>hk_data</code> is different:</p>
 </div>
@@ -1619,19 +1667,19 @@ Type:HOUSEKEEPING_DATA
 <div class="paragraph">
 <p>We haven&#8217;t inspected the <code>versions</code> group yet, it currently contains only one dataset, <code>format_version</code>. This version describes the changes in the HDF5 file with respect to available groups, datasets and attributes. The format version can be accessed as follows.</p>
 </div>
-<div id="_tabs_10" class="openblock tabs is-loading">
+<div id="_tabs_11" class="openblock tabs is-loading">
 <div class="content">
 <div class="ulist tablist">
 <ul>
-<li id="_tabs_10_egse_h5" class="tab">
+<li id="_tabs_11_egse_h5" class="tab">
 <p>egse.h5</p>
 </li>
-<li id="_tabs_10_h5py" class="tab">
+<li id="_tabs_11_h5py" class="tab">
 <p>h5py</p>
 </li>
 </ul>
 </div>
-<div id="_tabs_10_egse_h5--panel" class="tabpanel" aria-labelledby="_tabs_10_egse_h5">
+<div id="_tabs_11_egse_h5--panel" class="tabpanel" aria-labelledby="_tabs_11_egse_h5">
 <div class="listingblock">
 <div class="content">
 <pre>&gt;&gt;&gt; h5.show_attributes(h5_fd["/versions/format_version"])
@@ -1641,7 +1689,7 @@ Total size of attributes: 64 bytes</pre>
 </div>
 </div>
 </div>
-<div id="_tabs_10_h5py--panel" class="tabpanel" aria-labelledby="_tabs_10_h5py">
+<div id="_tabs_11_h5py--panel" class="tabpanel" aria-labelledby="_tabs_11_h5py">
 <div class="listingblock">
 <div class="content">
 <pre>&gt;&gt;&gt; list(h5_fd["/versions/format_version"].attrs)
@@ -1675,39 +1723,6 @@ Total size of attributes: 64 bytes</pre>
 <div class="paragraph">
 <p>Before we dive into the <code>data</code> groups, let&#8217;s first inspect the four remaining datasets <code>dpu</code>, <code>fee</code>, <code>obsid</code> and <code>register</code>. The <code>obsid</code> dataset contains the full observation identifier where this HDF5 file belongs to as a bytes object. If the <code>obsid</code> is empty, no observation was running.</p>
 </div>
-<div id="_tabs_11" class="openblock tabs is-loading">
-<div class="content">
-<div class="ulist tablist">
-<ul>
-<li id="_tabs_11_egse_h5" class="tab">
-<p>egse.h5</p>
-</li>
-<li id="_tabs_11_h5py" class="tab">
-<p>h5py</p>
-</li>
-</ul>
-</div>
-<div id="_tabs_11_egse_h5--panel" class="tabpanel" aria-labelledby="_tabs_11_egse_h5">
-<div class="listingblock">
-<div class="content">
-<pre>&gt;&gt;&gt; h5.get_data(h5_fd["/obsid"]).item()
-b'IAS_00088_00938'</pre>
-</div>
-</div>
-</div>
-<div id="_tabs_11_h5py--panel" class="tabpanel" aria-labelledby="_tabs_11_h5py">
-<div class="listingblock">
-<div class="content">
-<pre>&gt;&gt;&gt; h5_fd["/obsid"][()]
-b'IAS_00088_00938'</pre>
-</div>
-</div>
-</div>
-</div>
-</div>
-<div class="paragraph">
-<p>The <code>dpu</code> dataset contains DPU Processor specific parameters that are needed to properly process the data. These parameters are available as attributes to this dataset and are mainly used by the FITS generation process.</p>
-</div>
 <div id="_tabs_12" class="openblock tabs is-loading">
 <div class="content">
 <div class="ulist tablist">
@@ -1723,27 +1738,23 @@ b'IAS_00088_00938'</pre>
 <div id="_tabs_12_egse_h5--panel" class="tabpanel" aria-labelledby="_tabs_12_egse_h5">
 <div class="listingblock">
 <div class="content">
-<pre>&gt;&gt;&gt; h5.show_attributes(h5_fd["/dpu"])
-num_cycles: 10 (32 bytes)
-slicing_num_cycles: 0 (32 bytes)
-Total size of attributes: 64 bytes</pre>
+<pre>&gt;&gt;&gt; h5.get_data(h5_fd["/obsid"]).item()
+b'IAS_00088_00938'</pre>
 </div>
 </div>
 </div>
 <div id="_tabs_12_h5py--panel" class="tabpanel" aria-labelledby="_tabs_12_h5py">
 <div class="listingblock">
 <div class="content">
-<pre>&gt;&gt;&gt; list(h5_fd["/dpu"].attrs)
-['num_cycles', 'slicing_num_cycles']
-&gt;&gt;&gt; h5_fd["/dpu"].attrs["num_cycles"]
-10</pre>
+<pre>&gt;&gt;&gt; h5_fd["/obsid"][()]
+b'IAS_00088_00938'</pre>
 </div>
 </div>
 </div>
 </div>
 </div>
 <div class="paragraph">
-<p>The <code>fee</code> dataset contains FEE specific parameters that are needed to properly process the data. These parameters are available as attributes to this dataset and are mainly used by the FITS generation process. Currently, the only attribute if the <code>fee/type</code> which can be either 'N-FEE' or 'F-FEE'.</p>
+<p>The <code>dpu</code> dataset contains DPU Processor specific parameters that are needed to properly process the data. These parameters are available as attributes to this dataset and are mainly used by the FITS generation process.</p>
 </div>
 <div id="_tabs_13" class="openblock tabs is-loading">
 <div class="content">
@@ -1760,26 +1771,27 @@ Total size of attributes: 64 bytes</pre>
 <div id="_tabs_13_egse_h5--panel" class="tabpanel" aria-labelledby="_tabs_13_egse_h5">
 <div class="listingblock">
 <div class="content">
-<pre>&gt;&gt;&gt; h5.show_attributes(h5_fd["/fee"])
-type: N-FEE (54 bytes)
-Total size of attributes: 54 bytes</pre>
+<pre>&gt;&gt;&gt; h5.show_attributes(h5_fd["/dpu"])
+num_cycles: 10 (32 bytes)
+slicing_num_cycles: 0 (32 bytes)
+Total size of attributes: 64 bytes</pre>
 </div>
 </div>
 </div>
 <div id="_tabs_13_h5py--panel" class="tabpanel" aria-labelledby="_tabs_13_h5py">
 <div class="listingblock">
 <div class="content">
-<pre>&gt;&gt;&gt; list(h5_fd["/fee"].attrs)
-['type']
-&gt;&gt;&gt; h5_fd["/fee"].attrs["type"]
-'N-FEE'</pre>
+<pre>&gt;&gt;&gt; list(h5_fd["/dpu"].attrs)
+['num_cycles', 'slicing_num_cycles']
+&gt;&gt;&gt; h5_fd["/dpu"].attrs["num_cycles"]
+10</pre>
 </div>
 </div>
 </div>
 </div>
 </div>
 <div class="paragraph">
-<p>Finally, the <code>register</code> dataset is a Numpy array that is a mirror of the register memory map in the N-FEE at the time of the sync pulse.</p>
+<p>The <code>fee</code> dataset contains FEE specific parameters that are needed to properly process the data. These parameters are available as attributes to this dataset and are mainly used by the FITS generation process. Currently, the only attribute if the <code>fee/type</code> which can be either 'N-FEE' or 'F-FEE'.</p>
 </div>
 <div id="_tabs_14" class="openblock tabs is-loading">
 <div class="content">
@@ -1796,12 +1808,48 @@ Total size of attributes: 54 bytes</pre>
 <div id="_tabs_14_egse_h5--panel" class="tabpanel" aria-labelledby="_tabs_14_egse_h5">
 <div class="listingblock">
 <div class="content">
+<pre>&gt;&gt;&gt; h5.show_attributes(h5_fd["/fee"])
+type: N-FEE (54 bytes)
+Total size of attributes: 54 bytes</pre>
+</div>
+</div>
+</div>
+<div id="_tabs_14_h5py--panel" class="tabpanel" aria-labelledby="_tabs_14_h5py">
+<div class="listingblock">
+<div class="content">
+<pre>&gt;&gt;&gt; list(h5_fd["/fee"].attrs)
+['type']
+&gt;&gt;&gt; h5_fd["/fee"].attrs["type"]
+'N-FEE'</pre>
+</div>
+</div>
+</div>
+</div>
+</div>
+<div class="paragraph">
+<p>Finally, the <code>register</code> dataset is a Numpy array that is a mirror of the register memory map in the N-FEE at the time of the sync pulse.</p>
+</div>
+<div id="_tabs_15" class="openblock tabs is-loading">
+<div class="content">
+<div class="ulist tablist">
+<ul>
+<li id="_tabs_15_egse_h5" class="tab">
+<p>egse.h5</p>
+</li>
+<li id="_tabs_15_h5py" class="tab">
+<p>h5py</p>
+</li>
+</ul>
+</div>
+<div id="_tabs_15_egse_h5--panel" class="tabpanel" aria-labelledby="_tabs_15_egse_h5">
+<div class="listingblock">
+<div class="content">
 <pre>&gt;&gt;&gt; h5.get_data(h5_fd["/register"])
 array([ 17, 187,   0, ...,   0,   0,   0], dtype=uint8)</pre>
 </div>
 </div>
 </div>
-<div id="_tabs_14_h5py--panel" class="tabpanel" aria-labelledby="_tabs_14_h5py">
+<div id="_tabs_15_h5py--panel" class="tabpanel" aria-labelledby="_tabs_15_h5py">
 <div class="listingblock">
 <div class="content">
 <pre>&gt;&gt;&gt; h5_fd["/register"][()]
@@ -1956,22 +2004,22 @@ array([ 17, 187,   0, ...,   0,   0,   0], dtype=uint8)</pre>
 <div class="paragraph">
 <p>The top-level groups of an F-FEE HDF5 file are listed  below:</p>
 </div>
-<div id="_tabs_15" class="openblock tabs is-loading">
+<div id="_tabs_16" class="openblock tabs is-loading">
 <div class="content">
 <div class="ulist tablist">
 <ul>
-<li id="_tabs_15_egse_h5" class="tab">
+<li id="_tabs_16_egse_h5" class="tab">
 <p>egse.h5</p>
 </li>
-<li id="_tabs_15_h5py" class="tab">
+<li id="_tabs_16_h5py" class="tab">
 <p>h5py</p>
 </li>
-<li id="_tabs_15_h5tui" class="tab">
+<li id="_tabs_16_h5tui" class="tab">
 <p>h5tui</p>
 </li>
 </ul>
 </div>
-<div id="_tabs_15_egse_h5--panel" class="tabpanel" aria-labelledby="_tabs_15_egse_h5">
+<div id="_tabs_16_egse_h5--panel" class="tabpanel" aria-labelledby="_tabs_16_egse_h5">
 <div class="listingblock">
 <div class="content">
 <pre>&gt;&gt;&gt; h5_fd = h5.get_file("20240911_KUL_F-FEE_SPW_01273.hdf5")
@@ -1991,7 +2039,7 @@ Total size of attributes: 25 bytes</pre>
 </div>
 </div>
 </div>
-<div id="_tabs_15_h5py--panel" class="tabpanel" aria-labelledby="_tabs_15_h5py">
+<div id="_tabs_16_h5py--panel" class="tabpanel" aria-labelledby="_tabs_16_h5py">
 <div class="listingblock">
 <div class="content">
 <pre>&gt;&gt;&gt; h5_fd = h5py.File("20240911_KUL_F-FEE_SPW_01273.hdf5")
@@ -2000,7 +2048,7 @@ Total size of attributes: 25 bytes</pre>
 </div>
 </div>
 </div>
-<div id="_tabs_15_h5tui--panel" class="tabpanel" aria-labelledby="_tabs_15_h5tui">
+<div id="_tabs_16_h5tui--panel" class="tabpanel" aria-labelledby="_tabs_16_h5tui">
 <div class="imageblock text-center">
 <div class="content">
 <img src="../images/h5tui-icd-01.png" alt="h5tui icd 01" width="100%">
@@ -2014,55 +2062,6 @@ Total size of attributes: 25 bytes</pre>
 </div>
 <div class="paragraph">
 <p>Let&#8217;s look into this group into more detail. There is one sub-group <code>data</code> and two datasets <code>hk_deb</code> and <code>hk_aeb</code>. These two datasets are the housekeeping packets that are sent by the F-FEE together with the image data, i.e. when the DEB is in FULL_IMAGE mode and the AEB that was selected is in IMAGE mode.</p>
-</div>
-<div id="_tabs_16" class="openblock tabs is-loading">
-<div class="content">
-<div class="ulist tablist">
-<ul>
-<li id="_tabs_16_egse_h5" class="tab">
-<p>egse.h5</p>
-</li>
-<li id="_tabs_16_h5py" class="tab">
-<p>h5py</p>
-</li>
-<li id="_tabs_16_h5tui" class="tab">
-<p>h5tui</p>
-</li>
-</ul>
-</div>
-<div id="_tabs_16_egse_h5--panel" class="tabpanel" aria-labelledby="_tabs_16_egse_h5">
-<div class="listingblock">
-<div class="content">
-<pre>&gt;&gt;&gt; h5.show_groups(h5_fd["/AEB1-F"], max_level=1)
-[G] data
-[D] hk_aeb (253 bytes)
-[D] hk_deb (149 bytes)
-Total size of Group = 10.163 MB</pre>
-</div>
-</div>
-</div>
-<div id="_tabs_16_h5py--panel" class="tabpanel" aria-labelledby="_tabs_16_h5py">
-<div class="listingblock">
-<div class="content">
-<pre>&gt;&gt;&gt; [x for x in h5_fd["/AEB1-F"]]
-['data', 'hk_aeb', 'hk_deb']</pre>
-</div>
-</div>
-</div>
-<div id="_tabs_16_h5tui--panel" class="tabpanel" aria-labelledby="_tabs_16_h5tui">
-<div class="imageblock text-center">
-<div class="content">
-<img src="../images/h5tui-icd-02.png" alt="h5tui icd 02" width="100%">
-</div>
-</div>
-</div>
-</div>
-</div>
-<div class="paragraph">
-<p>The <code>data</code> group contains all the SpaceWire packets that have image data, i.e. normal data packets and overscan packets. The <code>data</code> group also has the attributes <code>ccd_side</code> and <code>overscan_lines</code> that are used to decode the SpaceWire packets into image data arrays. We will describe the <code>data</code> groups into more detail later in this section.</p>
-</div>
-<div class="paragraph">
-<p>The second top-level group is the <code>commands</code> group which contains a description of the commands that were sent right after the sync pulse for this cycle. The commands are numbered starting from zero and have an attribute <code>duration</code> which gives the total time that this command needed to execute (in seconds). The <code>h5tui</code> shows the commands with  syntax highlighting. We see that six commands were sent during this cycle, <code>sync_register_map</code>, <code>deb_read_hk</code> and four <code>aeb_read_hk</code>. We find back the result of these commands in the other groups.</p>
 </div>
 <div id="_tabs_17" class="openblock tabs is-loading">
 <div class="content">
@@ -2082,44 +2081,36 @@ Total size of Group = 10.163 MB</pre>
 <div id="_tabs_17_egse_h5--panel" class="tabpanel" aria-labelledby="_tabs_17_egse_h5">
 <div class="listingblock">
 <div class="content">
-<pre>&gt;&gt;&gt; h5.show_datasetss(h5_fd["/commands"])
-[D] 0 (104 bytes)
-[D] 1 (104 bytes)
-[D] 2 (104 bytes)
-[D] 3 (104 bytes)
-[D] 4 (104 bytes)
-[D] 5 (104 bytes)
-Total size of datasets in this group is 624 bytes
-&gt;&gt;&gt; h5.show_attributes(h5_fd["/commands/0"])
-duration: 0.02686471794731915 (32 bytes)
-Total size of attributes: 32 bytes</pre>
+<pre>&gt;&gt;&gt; h5.show_groups(h5_fd["/AEB1-F"], max_level=1)
+[G] data
+[D] hk_aeb (253 bytes)
+[D] hk_deb (149 bytes)
+Total size of Group = 10.163 MB</pre>
 </div>
 </div>
 </div>
 <div id="_tabs_17_h5py--panel" class="tabpanel" aria-labelledby="_tabs_17_h5py">
 <div class="listingblock">
 <div class="content">
-<pre>&gt;&gt;&gt; [x for x in h5_fd["/commands"]]
-['0', '1', '2', '3', '4', '5']
-&gt;&gt;&gt; h5_fd["/commands/0"][...]
-array(b"command_sync_register_map, args=[], kwargs={'dump-response': False, 'response': False}",
-      dtype=object)
-&gt;&gt;&gt; h5_fd["/commands/0"].attrs['duration']
-0.02686471794731915</pre>
+<pre>&gt;&gt;&gt; [x for x in h5_fd["/AEB1-F"]]
+['data', 'hk_aeb', 'hk_deb']</pre>
 </div>
 </div>
 </div>
 <div id="_tabs_17_h5tui--panel" class="tabpanel" aria-labelledby="_tabs_17_h5tui">
 <div class="imageblock text-center">
 <div class="content">
-<img src="../images/h5tui-icd-03.png" alt="h5tui icd 03" width="100%">
+<img src="../images/h5tui-icd-02.png" alt="h5tui icd 02" width="100%">
 </div>
 </div>
 </div>
 </div>
 </div>
 <div class="paragraph">
-<p>The Register Map that was synchronised is stored in the top-level <code>register</code> group as numpy array. You will have to convert this array into a RegisterMap object to inspect it. If you use the <code>rich</code> package  to print this, you will get a nice table with all register parameters and their attributes and values. The RegisterMap is synchronised on every cycle right after the reception of the timecode.</p>
+<p>The <code>data</code> group contains all the SpaceWire packets that have image data, i.e. normal data packets and overscan packets. The <code>data</code> group also has the attributes <code>ccd_side</code> and <code>overscan_lines</code> that are used to decode the SpaceWire packets into image data arrays. We will describe the <code>data</code> groups into more detail later in this section.</p>
+</div>
+<div class="paragraph">
+<p>The second top-level group is the <code>commands</code> group which contains a description of the commands that were sent right after the sync pulse for this cycle. The commands are numbered starting from zero and have an attribute <code>duration</code> which gives the total time that this command needed to execute (in seconds). The <code>h5tui</code> shows the commands with  syntax highlighting. We see that six commands were sent during this cycle, <code>sync_register_map</code>, <code>deb_read_hk</code> and four <code>aeb_read_hk</code>. We find back the result of these commands in the other groups.</p>
 </div>
 <div id="_tabs_18" class="openblock tabs is-loading">
 <div class="content">
@@ -2137,6 +2128,63 @@ array(b"command_sync_register_map, args=[], kwargs={'dump-response': False, 'res
 </ul>
 </div>
 <div id="_tabs_18_egse_h5--panel" class="tabpanel" aria-labelledby="_tabs_18_egse_h5">
+<div class="listingblock">
+<div class="content">
+<pre>&gt;&gt;&gt; h5.show_datasetss(h5_fd["/commands"])
+[D] 0 (104 bytes)
+[D] 1 (104 bytes)
+[D] 2 (104 bytes)
+[D] 3 (104 bytes)
+[D] 4 (104 bytes)
+[D] 5 (104 bytes)
+Total size of datasets in this group is 624 bytes
+&gt;&gt;&gt; h5.show_attributes(h5_fd["/commands/0"])
+duration: 0.02686471794731915 (32 bytes)
+Total size of attributes: 32 bytes</pre>
+</div>
+</div>
+</div>
+<div id="_tabs_18_h5py--panel" class="tabpanel" aria-labelledby="_tabs_18_h5py">
+<div class="listingblock">
+<div class="content">
+<pre>&gt;&gt;&gt; [x for x in h5_fd["/commands"]]
+['0', '1', '2', '3', '4', '5']
+&gt;&gt;&gt; h5_fd["/commands/0"][...]
+array(b"command_sync_register_map, args=[], kwargs={'dump-response': False, 'response': False}",
+      dtype=object)
+&gt;&gt;&gt; h5_fd["/commands/0"].attrs['duration']
+0.02686471794731915</pre>
+</div>
+</div>
+</div>
+<div id="_tabs_18_h5tui--panel" class="tabpanel" aria-labelledby="_tabs_18_h5tui">
+<div class="imageblock text-center">
+<div class="content">
+<img src="../images/h5tui-icd-03.png" alt="h5tui icd 03" width="100%">
+</div>
+</div>
+</div>
+</div>
+</div>
+<div class="paragraph">
+<p>The Register Map that was synchronised is stored in the top-level <code>register</code> group as numpy array. You will have to convert this array into a RegisterMap object to inspect it. If you use the <code>rich</code> package  to print this, you will get a nice table with all register parameters and their attributes and values. The RegisterMap is synchronised on every cycle right after the reception of the timecode.</p>
+</div>
+<div id="_tabs_19" class="openblock tabs is-loading">
+<div class="content">
+<div class="ulist tablist">
+<ul>
+<li id="_tabs_19_egse_h5" class="tab">
+<p>egse.h5</p>
+</li>
+<li id="_tabs_19_h5py" class="tab">
+<p>h5py</p>
+</li>
+<li id="_tabs_19_h5tui" class="tab">
+<p>h5tui</p>
+</li>
+</ul>
+</div>
+<div id="_tabs_19_egse_h5--panel" class="tabpanel" aria-labelledby="_tabs_19_egse_h5">
 <div class="listingblock">
 <div class="content">
 <pre>&gt;&gt;&gt; import rich
@@ -2168,7 +2216,7 @@ array(b"command_sync_register_map, args=[], kwargs={'dump-response': False, 'res
 </div>
 </div>
 </div>
-<div id="_tabs_18_h5py--panel" class="tabpanel" aria-labelledby="_tabs_18_h5py">
+<div id="_tabs_19_h5py--panel" class="tabpanel" aria-labelledby="_tabs_19_h5py">
 <div class="listingblock">
 <div class="content">
 <pre>&gt;&gt;&gt; import rich
@@ -2199,7 +2247,7 @@ array(b"command_sync_register_map, args=[], kwargs={'dump-response': False, 'res
 </div>
 </div>
 </div>
-<div id="_tabs_18_h5tui--panel" class="tabpanel" aria-labelledby="_tabs_18_h5tui">
+<div id="_tabs_19_h5tui--panel" class="tabpanel" aria-labelledby="_tabs_19_h5tui">
 <div class="imageblock text-center">
 <div class="content">
 <img src="../images/h5tui-icd-04.png" alt="h5tui icd 04" width="100%">
@@ -2256,19 +2304,19 @@ array(b'KUL_00030_00121', dtype=object)</pre>
 <dt class="hdlist1"><strong>/setup</strong></dt>
 <dd>
 <p>This dataset contains the Setup ID, in our HDF5 file we were using Setup 30. If you are using the <code>h5tui</code>, the full hierarchy of the Setup will be presented.</p>
-<div id="_tabs_19" class="openblock tabs is-loading">
+<div id="_tabs_20" class="openblock tabs is-loading">
 <div class="content">
 <div class="ulist tablist">
 <ul>
-<li id="_tabs_19_egse_h5" class="tab">
+<li id="_tabs_20_egse_h5" class="tab">
 <p>egse.h5</p>
 </li>
-<li id="_tabs_19_h5tui" class="tab">
+<li id="_tabs_20_h5tui" class="tab">
 <p>h5tui</p>
 </li>
 </ul>
 </div>
-<div id="_tabs_19_egse_h5--panel" class="tabpanel" aria-labelledby="_tabs_19_egse_h5">
+<div id="_tabs_20_egse_h5--panel" class="tabpanel" aria-labelledby="_tabs_20_egse_h5">
 <div class="listingblock">
 <div class="content">
 <pre>&gt;&gt;&gt; h5_fd["/setup"][...]
@@ -2276,7 +2324,7 @@ array(b'00030', dtype=object)</pre>
 </div>
 </div>
 </div>
-<div id="_tabs_19_h5tui--panel" class="tabpanel" aria-labelledby="_tabs_19_h5tui">
+<div id="_tabs_20_h5tui--panel" class="tabpanel" aria-labelledby="_tabs_20_h5tui">
 <div class="imageblock">
 <div class="content">
 <img src="../images/h5tui-icd-06.png" alt="h5tui icd 06">
@@ -2983,8 +3031,8 @@ dt = str_to_datetime(format_datetime())</pre>
 </div>
 <div id="footer">
 <div id="footer-text">
-Version 0.6<br>
-Last updated 2024-09-12 09:31:22 +0200
+Version 0.7<br>
+Last updated 2024-09-29 16:56:54 +0200
 </div>
 </div>
 <script>

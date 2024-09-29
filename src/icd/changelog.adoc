@@ -1,5 +1,8 @@
 == Changelog
 
+29/09/2024 — v0.7::
+* Updated the section on the format version  of the HDF5 files, see <<hdf5-format-version>>.
+
 11/09/2024 — v0.6::
 * Added a description on the HDF5 files for the F-FEE, see <<hdf5-f-fee-inspection>>.
 
