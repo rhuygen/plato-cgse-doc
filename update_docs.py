@@ -11,6 +11,8 @@ Start the following command from the project folder (make sure you are in the vi
 """
 
 import subprocess
+import textwrap
+
 from pathlib import Path
 
 import rich
@@ -53,8 +55,11 @@ rich.print("done.")
 
 rich.print(textwrap.dedent(
     """
-    At this point, you should fix the links for the documents in the top-level `index.html` fie. 
-    Remove the `../../` for all docs, i.e. 10 replacements. 
+    [orange3]Warning:[/]
+    At this point, you should fix the links for the documents in the `index.html` files: 
+    
+    * Remove the `../../` for all docs in the top-level `__index__.html`, i.e. 10 replacements.
+    * Replace `../../` with `../` for all the docs in the  `__index__.html` of the `docs` folder.  
     
     Eventually, I will automate this in this script.
     """

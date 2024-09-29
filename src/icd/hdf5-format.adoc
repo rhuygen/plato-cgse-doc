@@ -46,6 +46,30 @@ F-FEE::
 ----
 ======
 
+The `format_version` for the N-FEE HDF5 files is set in the function `save_format_version()` in the `egse.dpu.__init__.py`. For the F-FEE HDF5 files, the `format_version` is set in the method `dump_format_version()` of the Data Dumper. As of this writing, the history is as follows:
+
+[tabs]
+======
+N-FEE::
++
+----
+# 2.0 - introduced the format_version
+# 2.1 - Added obsid as a dataset to the HDF5 file
+# 2.2 - Multiple commands can now be saved under the same frame number
+# 2.3 - introduced /dpu/num_cycles attribute
+# 2.4 - introduced /dpu/slicing_num_cycles attribute
+# 2.5 - introduced /{frame number}/hk_data dataset
+# 2.6 - introduced /fee/type attribute (type can be N-FEE or F-FEE)
+----
+F-FEE::
++
+----
+# 3.0 – introduced the format_version for F-CAM
+# 3.1 – /commands now have a timestamp attribute, next to the duration
+----
+======
+
+
 Since the format and content of the N-FEE and F-FEE HDF5 files are quite different, we have split the description in two sections below. We will go through the different groups, datasets, and attributes of each of these files, explain how to extract the information from the HDF5 file and what the content is. Since some of you are more used to the `h5py` package we will try to extract and visualize the data using both the `egse.h5` as the `h5py` package. A third visualisation is with the `h5tui` app, which is a generic HDF5 viewer (a terminal app) that was developed for this project. We will use that with the F-FEE HDF5 files.
 
 [#hdf5-n-fee-inspection]
