@@ -553,8 +553,8 @@ body.book #toc,body.book #preamble,body.book h1.sect0,body.book .sect1>h2{page-b
 <h1>Common–EGSE : Developer Manual</h1>
 <div class="details">
 <span id="author" class="author">Rik Huygen, Sara Regibo</span><br>
-<span id="revnumber">version 1.10,</span>
-<span id="revdate">06/03/2024</span>
+<span id="revnumber">version 1.12,</span>
+<span id="revdate">08/10/2024</span>
 </div>
 <div id="toc" class="toc2">
 <div id="toctitle">Table of Contents</div>
@@ -609,7 +609,12 @@ body.book #toc,body.book #preamble,body.book h1.sect0,body.book .sect1>h2{page-b
 <li><a href="#_resources">3.13. Resources</a></li>
 </ul>
 </li>
-<li><a href="#_writing_docstrings">4. Writing docstrings</a></li>
+<li><a href="#writing-docstrings">4. Writing docstrings</a>
+<ul class="sectlevel2">
+<li><a href="#_what_needs_to_go_into_the_docstring_and_what_not">4.1. What needs to go into the docstring and what not?</a></li>
+<li><a href="#_where_will_the_docstring_show_up">4.2. Where will the docstring show up?</a></li>
+</ul>
+</li>
 </ul>
 </li>
 <li><a href="#_part_ii_core_concepts">Part II — Core Concepts</a>
@@ -619,9 +624,10 @@ body.book #toc,body.book #preamble,body.book h1.sect0,body.book .sect1>h2{page-b
 <li><a href="#_the_log_manager">5.1. The Log Manager</a></li>
 <li><a href="#_the_configuration_manager">5.2. The Configuration Manager</a></li>
 <li><a href="#_the_storage_manager">5.3. The Storage Manager</a></li>
-<li><a href="#_the_process_manager">5.4. The Process Manager</a></li>
-<li><a href="#_the_synoptics_manager">5.5. The Synoptics Manager</a></li>
-<li><a href="#_the_telemetry_tm_dictionary">5.6. The Telemetry (TM) Dictionary</a></li>
+<li><a href="#data-dumper">5.4. The Data Dumper</a></li>
+<li><a href="#_the_process_manager">5.5. The Process Manager</a></li>
+<li><a href="#_the_synoptics_manager">5.6. The Synoptics Manager</a></li>
+<li><a href="#_the_telemetry_tm_dictionary">5.7. The Telemetry (TM) Dictionary</a></li>
 </ul>
 </li>
 <li><a href="#_the_commanding_concept">6. The Commanding Concept</a>
@@ -845,6 +851,26 @@ body.book #toc,body.book #preamble,body.book h1.sect0,body.book .sect1>h2{page-b
 <div class="sectionbody">
 <div class="dlist">
 <dl>
+<dt class="hdlist1">08/10/2024 — v1.12</dt>
+<dd>
+<div class="ulist">
+<ul>
+<li>
+<p>Added a section on the data dumper, see <a href="#data-dumper">Section 5.4</a></p>
+</li>
+</ul>
+</div>
+</dd>
+<dt class="hdlist1">06/09/2024 — v1.11</dt>
+<dd>
+<div class="ulist">
+<ul>
+<li>
+<p>Filled the section on writing docstrings, see <a href="#writing-docstrings">Chapter 4</a>.</p>
+</li>
+</ul>
+</div>
+</dd>
 <dt class="hdlist1">06/03/2024 — v1.10</dt>
 <dd>
 <div class="ulist">
@@ -2314,23 +2340,114 @@ This is a naming convention thing&#8230;&#8203; names of user defined sub-classe
 </div>
 </div>
 <div class="sect1">
-<h2 id="_writing_docstrings">4. Writing docstrings</h2>
+<h2 id="writing-docstrings">4. Writing docstrings</h2>
 <div class="sectionbody">
 <div class="paragraph">
-<p>This might need to go into the style guide or we leave it here as a stand-alone section.</p>
+<p>For this project we use the <a href="https://google.github.io/styleguide/pyguide.html#38-comments-and-docstrings">Google format for docstrings</a>. Below, you can find a quick example of the docstring for the <code>humanize_bytes()</code> function in the <code>egse.bits</code> module.</p>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre>def humanize_bytes(n: int, base: Union[int, str] = 2, precision: int = 3) -&gt; str:
+    """
+    Represents the size `n` in human readable form, i.e. as byte, KiB, MiB, GiB, ...
+
+    Please note that, by default, I use the IEC standard (International Engineering Consortium)
+    which is in `base=2` (binary), i.e. 1024 bytes = 1.0 KiB. If you need SI units (International
+    System of Units), you need to specify `base=10` (decimal), i.e. 1000 bytes = 1.0 kB.
+
+    Args:
+        n (int): number of byte
+        base (int, str): binary (2) or decimal (10)
+        precision (int): the number of decimal places [default=3]
+    Returns:
+        a human readable size, like 512 byte or 2.300 TiB.
+    Raises:
+        ValueError: when base is different from 2 (binary) or 10 (decimal).
+
+    Examples:
+        &gt;&gt;&gt; assert humanize_bytes(55) == "55 bytes"
+        &gt;&gt;&gt; assert humanize_bytes(1024) == "1.000 KiB"
+        &gt;&gt;&gt; assert humanize_bytes(1000, base=10) == "1.000 kB"
+        &gt;&gt;&gt; assert humanize_bytes(1000000000) == '953.674 MiB'
+        &gt;&gt;&gt; assert humanize_bytes(1000000000, base=10) == '1.000 GB'
+        &gt;&gt;&gt; assert humanize_bytes(1073741824) == '1.000 GiB'
+        &gt;&gt;&gt; assert humanize_bytes(1024**5 - 1, precision=0) == '1024 TiB'
+    """</pre>
+</div>
+</div>
+<div class="paragraph">
+<p>The first line shall be a short summary of the functionality ended by a period or question mark. The rest, more detailed information, shall go after a blank line that separates it from the summary line.</p>
+</div>
+<div class="paragraph">
+<p>You can use the following sections:</p>
 </div>
 <div class="ulist">
 <ul>
 <li>
-<p>Explain which format of docstring we have chosen &#8594; Google</p>
+<p><strong>Args:</strong> a list of the parameter names with a short description and possibly defaults values.</p>
 </li>
 <li>
-<p>What needs to go into the docstring and what not</p>
+<p><strong>Returns:</strong> or <strong>Yields:</strong> describe the returns value(s) their content and type. This section can be ommitted when the docstring starts with the word 'Returns' or 'Yields", or when the function doesn&#8217;t return anything (None).</p>
 </li>
 <li>
-<p>where will the docstring show up &#8594; in PyCharm help, in the REPL, pdoc3</p>
+<p><strong>Raises:</strong> a list of the Exceptions that might be raised by this function.</p>
+</li>
+<li>
+<p><strong>Examples:</strong> provide some simple examples and their possible outcome.</p>
 </li>
 </ul>
+</div>
+<div class="sect2">
+<h3 id="_what_needs_to_go_into_the_docstring_and_what_not">4.1. What needs to go into the docstring and what not?</h3>
+<div class="paragraph">
+<p>The docstring shall contain all information that the user of the function, method, class or module needs to use it. The <em>user</em> in this case can be a developer or a normal user of a Python function. Try to adapt the type and detail of the information in the docstring accordingly.</p>
+</div>
+<div class="paragraph">
+<p>Do not describe <em>how</em> the functionality is implemented, instead describe <em>what</em> functionality is provided and how it can be used.</p>
+</div>
+</div>
+<div class="sect2">
+<h3 id="_where_will_the_docstring_show_up">4.2. Where will the docstring show up?</h3>
+<div class="paragraph">
+<p>We will provide an API documentation that contains all docstrings of all classes, functions, methods and modules that are part of the CGSE. If you are using a Python IDE, use the available functionality to visualize the docstring information of a function. For PyCharm e.g. this is the 'F1' key when the cursor is on the function name.</p>
+</div>
+<div class="paragraph">
+<p>If you are in the IPython REPL, you can type the function name followed by q question mark:</p>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre>In [2]: humanize_bytes?
+Signature: humanize_bytes(n: int, base: Union[int, str] = 2, precision: int = 3) -&gt; str
+Docstring:
+Represents the size `n` in human readable form, i.e. as byte, KiB, MiB, GiB, ...
+
+Please note that, by default, I use the IEC standard (International Engineering Consortium)
+which is in `base=2` (binary), i.e. 1024 bytes = 1.0 KiB. If you need SI units (International
+System of Units), you need to specify `base=10` (decimal), i.e. 1000 bytes = 1.0 kB.
+
+Args:
+    n (int): number of byte
+    base (int, str): binary (2) or decimal (10)
+    precision (int): the number of decimal places [default=3]
+Returns:
+    a human readable size, like 512 byte or 2.300 TiB
+Raises:
+    ValueError when base is different from 2 (binary) or 10 (decimal).
+
+Examples:
+assert humanize_bytes(55) == "55 bytes"
+assert humanize_bytes(1024) == "1.000 KiB"
+assert humanize_bytes(1000, base=10) == "1.000 kB"
+assert humanize_bytes(1000000000) == '953.674 MiB'
+assert humanize_bytes(1000000000, base=10) == '1.000 GB'
+assert humanize_bytes(1073741824) == '1.000 GiB'
+assert humanize_bytes(1024**5 - 1, precision=0) == '1024 TiB'
+File:      ~/Documents/PyCharmProjects/plato-common-egse/src/egse/bits.py
+Type:      function
+
+In [3]:</pre>
+</div>
+</div>
 </div>
 </div>
 </div>
@@ -2440,7 +2557,161 @@ $ invoke start-core-egse</pre>
 </div>
 </div>
 <div class="sect2">
-<h3 id="_the_process_manager">5.4. The Process Manager</h3>
+<h3 id="data-dumper">5.4. The Data Dumper</h3>
+<div class="paragraph">
+<p>We have some problems with performance in reading out the N-FEE when we request both sides of a CCD. The reason for that is probably a series of events, such as waiting for a busy storage manager, garbage collection, data processing, etc. When starting to develop the code for the fast camera, we want to avoid these performance problems as much as possible and we made a number of decisions that are explained below.</p>
+</div>
+<div class="ulist">
+<ul>
+<li>
+<p>The DPU Processor should not have to wait for confirmation of the storage manager when saving data. So, we should change from a REQ-REP protocol to a PUSH-PULL protocol.</p>
+</li>
+<li>
+<p>The DPU Processor shall do less processing of information before sending messages to other components. Actually, the process that reads out the spacewire data packets from the F-FEE shall be as simple as possible and delegate all possible tasks to other processes.</p>
+</li>
+<li>
+<p>Communication between processes can be optimised using inter-process communication (IPC) instead of Transmission Control Protocol (TCP).</p>
+</li>
+</ul>
+</div>
+<div class="paragraph">
+<p>So, we started out designing the new F-DPU Processes.</p>
+</div>
+<div class="paragraph">
+<p>There are two main problems that we identified with the Data Storage. (1) The Storage Manager forms a bottleneck handling all data that is generated by the system, not only writing science data to the HDF5 files, but also handling (and duplicating) all housekeeping and auxiliary data that is generated by all the devices used during the test. (2) Using the request-reply (REQ-REP) protocol, the process that generates the data and sends it to the storage manager has to wait for a reply from the Storage Manager with a confirmation of the data being written properly. This might lead to a delay when the Storage manager is very busy writing information to different files and formats.</p>
+</div>
+<div class="paragraph">
+<p>We decided to keep the functionality of the Storage Manager as it is, don&#8217;t touch it since it is still used for all N-CAM activities. In addition, we will build a new process that will only handle the F-FEE HDF5 data from the F-DPU Processor. That new process we call the <em>Data Dumper</em> (<code>data_dump</code>). All data that we retrieve from the F-FEE will be sent from the F-DPU Processor to the data dumper using a PUSH-PULL protocol. This ZeroMQ message protocol can push messages to multiple workers, but we will only connect with one worker, i.e. the data dumper.</p>
+</div>
+<div class="paragraph">
+<p>Our seconds design point above says the F-DPU Processor shall do as few processing as possible and delegate those tasks to other processes. The reason is to make sure the F-DPU Processor can readout the F-FEE data fast enough to avoid any buffer overflow errors. For that reason we put a process in between the F-DPU Processor and the data dumper which will take over the identification of data packets, and processing those packets before they are sent to the data dumper. Communication between the F-DPU Processor and the new data processor is also based on the PUSH-PULL message protocol.</p>
+</div>
+<div class="paragraph">
+<p>It&#8217;s time to put that into a diagram in the hope it will clarify. Don&#8217;t worry, we will talk you trough it.</p>
+</div>
+<div class="imageblock text-center">
+<div class="content">
+<img src="../images/f-cam-data-dump.png" alt="f cam data dump" width="80%">
+</div>
+</div>
+<div class="paragraph">
+<p>The figure above contains the three processes described above, the F-DPU (FastCameraDPUProcessor), the data processor (FastCameraDataProcessor) and the data dumper (data_dump). The communication between these processes is based on the ZeroMQ PUSH-PULL protocol. Since these processes always run on the CGSE server, we use the faster inter-process communication (IPC) instead of the transmission-control protocol (TCP). We see that data is pushed from the F-DPU to the Data Processor to the data dumper. The F-DPU Processor gets the data from the F-FEE, so there is transport of data and information between the F-DPU and the DSI, which is the SpaceWire interface connected to the F-FEE.</p>
+</div>
+<div class="paragraph">
+<p>Of course, the data dumper shall also be able to retrieve commands, mainly from the F-DPU, to synchronise data flow or update configuration settings. This is done through the ZeroMQ DEALER-ROUTER protocol which allows to send commands to the data dumper and request a return value only when needed. For example, if the data dumper needs to update its Setup to the latest version, you wouldn&#8217;t require a reply when you send a <code>reload-setup</code> command. On the other hand, if you request status information from the data dumper you do expect a reply.</p>
+</div>
+<div class="sect3">
+<h4 id="_the_data_flow">5.4.1. The data flow</h4>
+<div class="paragraph">
+<p>This section explains what kind of data the data dumper receives and how this is handled. All data is stored into an HDF5 file. The format of this file is explained in the <a href="https://ivs-kuleuven.github.io/plato-cgse-doc/asciidocs/icd.html#hdf5-format">CGSE ICD</a> [PLATO-KUL-PL-ICD-0002] section 4.2.</p>
+</div>
+<div class="dlist">
+<dl>
+<dt class="hdlist1">Timecode</dt>
+<dd>
+<p>The timecode is an integer between 0 and 63 and it is sent by the F-FEE immediately after the reception of a synchronisation pulse. The timecode marks the start of a readout cycle. So, when the data dumper receives a timecode, it closes its current HDF5 file and creates a new HDF5 file. The HDF5 files are created in the <code>daily/YYYYMMDD</code> folder at the location given by the <code>PLATO_DATA_STORAGE_LOCATION</code> environment variable. An example name for an HDF5 file that was created on our system that was connected to the EM in Leuven: <code>/data/KUL/daily/20241007/20241007_KUL_F-FEE_SPW_00042.hdf5</code>.</p>
+<div class="paragraph">
+<p>Remember, each timecode creates a new HDF5 file. That is every 2.5 seconds.</p>
+</div>
+</dd>
+<dt class="hdlist1">Housekeeping Packets</dt>
+<dd>
+<p>The data dumper receives housekeeping packets for the DEB and the active AEBs. This housekeeping is only retrieved when the F-FEE is actually sending out image data. The housekeeping is stored in the same group as its image data (see further). The dataset names are <code>hk_aeb</code> and <code>hk_deb</code>.</p>
+</dd>
+<dt class="hdlist1">Housekeeping Data</dt>
+<dd>
+<p>The first thing the F-DPU Processor does when it receives a timecode, is requesting the register map and the housekeeping data from the DEB and all AEBs. The difference from housekeeping <em>packets</em> that are sent by the F-FEE is that housekeeping <em>data</em>, that is retrieved by RMAP commanding, doesn&#8217;t have a packet header. The housekeeping data is saved in the group <code>hk-data</code> and contains the datasets 'DEB', 'AEB1', 'AEB3', 'AEB3', and 'AEB4' and you should find this in every single HDF5 file.</p>
+</dd>
+<dt class="hdlist1">Register Map</dt>
+<dd>
+<p>The register map, which is the configuration memory area of the F-FEE, is retrieved from the F-FEE by the F-DPU using a few RMAP memory read requests. The register map is stored in the HDF5 file in a dataset named 'register'. Each HDF5 file shall have this dataset, and it contains the configuration as was commanded and as it will be active starting on the next timecode/HDF5 file.</p>
+</dd>
+<dt class="hdlist1">Commands</dt>
+<dd>
+<p>The data dumper also retrieves all commands that have been send to the F-FEE with their arguments. This information is stored in the group <code>commands</code>. The first six commands will always be <code>command_sync_register_map()</code>, <code>command_deb_read_hk()</code>, and <code>command_aeb_read_hk('AEB1')</code> for each AEB.</p>
+</dd>
+<dt class="hdlist1">CCD Image data</dt>
+<dd>
+<p>When the F-FEE is configured in science mode (DEB=FULL_IMAGE, AEBx=IMAGE and DTC_IN_MODE set accordingly), the data dumper will receive all image data as SpaceWire data packets, each containing the readouts of one row of the CCD. All these packets are stored in the group data which is a subgroup of <code>AEBx-S</code> where 'x'=1,2,3,4 and 'S'='E' or 'F'. For example, when image data is sent for the E-side of AEB2, the group <code>AEB2_E</code> will contain a group <code>data</code> with all the image data packets, and also the groups <code>hk_deb</code> and <code>hk_aeb</code> (see above). In the default readout mode, there shall be 2260 datasets with image data inside the <code>data</code> group.</p>
+<div class="paragraph">
+<p>When image data is available in the HDF5 file, the File group will have the attribute <code>has_data</code> set to True, if no image data was sent, this attribute will be False.</p>
+</div>
+<div class="paragraph">
+<p>Also the <code>data</code> group has two attributes attached when image data is available, i.e. <code>ccd_side</code> and the <code>overscan_lines</code></p>
+</div>
+<div class="paragraph">
+<p>On the F-FEE EM we suffered from buffer overflow errors when receiving image data, resulting in corrupt data packets being sent to the data dumper. These packets are stored in the group <code>spw-data</code>. What we saw for the EM is that these corrupt packets were sometime longer, sometimes shorter than the valid data packets, but the amount of packets matched the amount of missing packets in the <code>data</code> group.</p>
+</div>
+</dd>
+<dt class="hdlist1">Observation ID</dt>
+<dd>
+<p>When an observation is started, the OBSID will be sent to the data dumper. The OBSID will be saved in the <code>obsid</code> group.</p>
+</dd>
+</dl>
+</div>
+</div>
+<div class="sect3">
+<h4 id="_commanding_the_data_dumper">5.4.2. Commanding the data dumper</h4>
+<div class="paragraph">
+<p>The data dumper listens to commands coming in on the <code>DATA_DUMPER.COMMANDING_PORT</code>. A number of the available commands are also provided as terminal commands. That is described for each of the commands below.
+The following commands are currently recognised:</p>
+</div>
+<div class="dlist">
+<dl>
+<dt class="hdlist1">HELO</dt>
+<dd>
+<p>This command is used to register a process that wants to communicate with the data dumper. The data dumper keeps a registry of all registered processes. The command expects the name of the process that registers. A reply is sent on request.</p>
+</dd>
+<dt class="hdlist1">BYE</dt>
+<dd>
+<p>This command is used to unregister from the data dumper. No reply is sent.</p>
+</dd>
+<dt class="hdlist1">LOCATION</dt>
+<dd>
+<p>This command will set the new location for the HDF5 files after checking if the location exists and is writable. An acknowledgment will be sent on request.</p>
+<div class="paragraph">
+<p>The corresponding terminal command: <code>data_dump set-location &lt;fully qualified folder name&gt;</code></p>
+</div>
+</dd>
+<dt class="hdlist1">RELOAD-SETUP</dt>
+<dd>
+<p>This command is used to instruct the data dumper to reload the latest Setup from the configuration manager. An acknowledgment will be sent on request.</p>
+<div class="paragraph">
+<p>The corresponding terminal command: <code>data_dump reload-setup</code></p>
+</div>
+</dd>
+<dt class="hdlist1">STATUS</dt>
+<dd>
+<p>This command requests status information from the data dumper. The reply string will look like this:</p>
+<div class="listingblock">
+<div class="content">
+<pre>Data Dumper:
+  Version             : 0.4.0
+  Hostname            : 10.33.179.160
+  Commanding port     : 30305
+  Monitoring port     : 30304
+  Data dump port      : 30104
+  Data location       : /data/KUL/daily/20241008
+  Site ID             : KUL
+  Setup loaded        : 00035
+  Scheduler           : ['Scheduler.set_new_location → 2024-10-09 00:02:00+00:00']
+  Dealers             : DATA-DUMP-STATUS, F-DPU</pre>
+</div>
+</div>
+<div class="paragraph">
+<p>The corresponding terminal command is: <code>data_dump status</code></p>
+</div>
+</dd>
+<dt class="hdlist1">QUIT</dt>
+<dd>
+<p>This command will terminate the data dumper process. All open files and connections will be closed and the scheduler will be stopped. This command will only be accepted if it i send by a registered process. No reply is sent.</p>
+</dd>
+</dl>
+</div>
+</div>
+</div>
+<div class="sect2">
+<h3 id="_the_process_manager">5.5. The Process Manager</h3>
 <div class="paragraph">
 <p>The job of the process manager is to keep track and monitor the execution of running processes during the Camera Tests.</p>
 </div>
@@ -2449,7 +2720,7 @@ $ invoke start-core-egse</pre>
 </div>
 </div>
 <div class="sect2">
-<h3 id="_the_synoptics_manager">5.5. The Synoptics Manager</h3>
+<h3 id="_the_synoptics_manager">5.6. The Synoptics Manager</h3>
 <div class="paragraph">
 <p><em>Synoptics</em> = in a form of a summary or synopsis; taking or involving a comprehensive mental view. According to the Oxford Dictionary.</p>
 </div>
@@ -2479,7 +2750,7 @@ $ invoke start-core-egse</pre>
 <p>The Synoptics Manager stores this information in one centralised location (the synoptics file) with generic parameter names.</p>
 </div>
 <div class="sect3">
-<h4 id="_synoptical_parameters">5.5.1. Synoptical Parameters</h4>
+<h4 id="_synoptical_parameters">5.6.1. Synoptical Parameters</h4>
 <div class="paragraph">
 <p>The housekeeping parameters that are stored in the synoptics are:</p>
 </div>
@@ -2499,7 +2770,7 @@ $ invoke start-core-egse</pre>
 </div>
 </div>
 <div class="sect2">
-<h3 id="_the_telemetry_tm_dictionary">5.6. The Telemetry (TM) Dictionary</h3>
+<h3 id="_the_telemetry_tm_dictionary">5.7. The Telemetry (TM) Dictionary</h3>
 <div class="paragraph">
 <p>The <code>tm-dicionary.csv</code> file (further referred to as the "telemetry &#8482; dictionary") provides an overview of all housekeeping (HK) and metrics parameters in the EGSE system.  It is used:</p>
 </div>
@@ -2517,7 +2788,7 @@ $ invoke start-core-egse</pre>
 </ul>
 </div>
 <div class="sect3">
-<h4 id="_the_files_content">5.6.1. The File&#8217;s Content</h4>
+<h4 id="_the_files_content">5.7.1. The File&#8217;s Content</h4>
 <div class="paragraph">
 <p>For each device we need to add all HK parameters to the TM dictionary.  For each of these parameters you need to add one line with the following information (in the designated columns):</p>
 </div>
@@ -2639,7 +2910,7 @@ $ invoke start-core-egse</pre>
 </div>
 </div>
 <div class="sect3">
-<h4 id="_egse_conform_parameter_names">5.6.2. EGSE-Conform Parameter Names</h4>
+<h4 id="_egse_conform_parameter_names">5.7.2. EGSE-Conform Parameter Names</h4>
 <div class="paragraph">
 <p>The correct (i.e. EGSE-conform) naming of the telemetry should be taken care of in the <code>get_housekeeping</code> method of the device protocols.</p>
 </div>
@@ -2733,7 +3004,7 @@ $ invoke start-core-egse</pre>
 </div>
 </div>
 <div class="sect3">
-<h4 id="_synoptics">5.6.3. Synoptics</h4>
+<h4 id="_synoptics">5.7.3. Synoptics</h4>
 <div class="paragraph">
 <p>The Synoptics Manager groups a pre-defined set of HK values in a single file.  It&#8217;s not the original EGSE-conform names that are use in the synoptics, but names with the prefix <code>GSYN_</code>.  The following information is comprised in the synoptics:</p>
 </div>
@@ -2770,7 +3041,7 @@ $ invoke start-core-egse</pre>
 </div>
 </div>
 <div class="sect3">
-<h4 id="_translation_tables">5.6.4. Translation Tables</h4>
+<h4 id="_translation_tables">5.7.4. Translation Tables</h4>
 <div class="paragraph">
 <p>The translation tables that were mentioned in the introduction, can be created by the <code>read_conversion_dict</code> function in <code>egse.hk</code>.  It takes the following input parameters:</p>
 </div>
@@ -2799,7 +3070,7 @@ $ invoke start-core-egse</pre>
 </div>
 </div>
 <div class="sect3">
-<h4 id="_sending_hk_to_synoptics">5.6.5. Sending HK to Synoptics</h4>
+<h4 id="_sending_hk_to_synoptics">5.7.5. Sending HK to Synoptics</h4>
 <div class="paragraph">
 <p>When you want to include HK of your devices, you need to take the following actions:</p>
 </div>
@@ -7481,8 +7752,8 @@ Below this point we have miscellaneous topics that still need their place in the
 </div>
 <div id="footer">
 <div id="footer-text">
-Version 1.10<br>
-Last updated 2024-03-29 11:36:34 +0100
+Version 1.12<br>
+Last updated 2024-10-08 11:42:15 +0200
 </div>
 </div>
 <script type="text/x-mathjax-config">
