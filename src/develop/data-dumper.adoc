@@ -102,3 +102,9 @@ The corresponding terminal command is: `data_dump status`
 
 QUIT::
 This command will terminate the data dumper process. All open files and connections will be closed and the scheduler will be stopped. This command will only be accepted if it is sent by a registered process. No reply is sent.
+
+=== Start and stop the data_dump
+
+The data dumper is made part of the core services. That means it will show up in the Process Manager GUI in the section on the core services. It also means that, for operational systems that are working with the F-CAM, the `data_dump` process will be started and maintained by `systemd`, i.e. the process will automatically start at system startup and restarted when quit or crashed. No need to worry about it 🙂.
+
+For developers who run their own core services on their development machine, the `data_dump` process is started and stopped together with all other core services using the `invoke start-core-egse` and `invoke stop-core-services` commands.
