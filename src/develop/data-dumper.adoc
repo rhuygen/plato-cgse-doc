@@ -107,4 +107,23 @@ This command will terminate the data dumper process. All open files and connecti
 
 The data dumper is made part of the core services. That means it will show up in the Process Manager GUI in the section on the core services. It also means that, for operational systems that are working with the F-CAM, the `data_dump` process will be started and maintained by `systemd`, i.e. the process will automatically start at system startup and restarted when quit or crashed. No need to worry about it 🙂.
 
+If you want to check if the data dumper is running and properly configured, use the `status` command:
+
+----
+$ data_dump status
+Data Dumper:
+  Version             : 0.4.0
+  Hostname            : 10.33.179.160
+  Commanding port     : 30305
+  Monitoring port     : 30304
+  Data dump port      : 30104
+  Data location       : /data/KUL/daily/20241008
+  Site ID             : KUL
+  Setup loaded        : 00035
+  Scheduler           : ['Scheduler.set_new_location → 2024-10-09 00:02:00+00:00']  <1>
+  Dealers             : DATA-DUMP-STATUS, F-DPU  <2>
+----
+<1> The scheduler takes care of setting the correct location for the next day. This entry shows the function that will be called at a given date/time.
+<2> The dealers are the processes that are registered to the data dumper.
+
 For developers who run their own core services on their development machine, the `data_dump` process is started and stopped together with all other core services using the `invoke start-core-egse` and `invoke stop-core-services` commands.
