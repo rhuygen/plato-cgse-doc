@@ -1,5 +1,11 @@
 == Changelog
 
+08/10/2024 — v1.12::
+* Added a section on the data dumper, see <<data-dumper>>
+
+06/09/2024 — v1.11::
+* Filled the section on writing docstrings, see <<writing-docstrings>>.
+
 06/03/2024 — v1.10::
 * Added a story about finding a left-open socket... see <<stories>>.
 

@@ -1,7 +1,88 @@
+[#writing-docstrings]
 == Writing docstrings
 
-This might need to go into the style guide or we leave it here as a stand-alone section.
+For this project we use the https://google.github.io/styleguide/pyguide.html#38-comments-and-docstrings[Google format for docstrings]. Below, you can find a quick example of the docstring for the `humanize_bytes()` function in the `egse.bits` module.
 
-* Explain which format of docstring we have chosen -> Google
-* What needs to go into the docstring and what not
-* where will the docstring show up -> in PyCharm help, in the REPL, pdoc3
+----
+def humanize_bytes(n: int, base: Union[int, str] = 2, precision: int = 3) -> str:
+    """
+    Represents the size `n` in human readable form, i.e. as byte, KiB, MiB, GiB, ...
+
+    Please note that, by default, I use the IEC standard (International Engineering Consortium)
+    which is in `base=2` (binary), i.e. 1024 bytes = 1.0 KiB. If you need SI units (International
+    System of Units), you need to specify `base=10` (decimal), i.e. 1000 bytes = 1.0 kB.
+
+    Args:
+        n (int): number of byte
+        base (int, str): binary (2) or decimal (10)
+        precision (int): the number of decimal places [default=3]
+    Returns:
+        a human readable size, like 512 byte or 2.300 TiB.
+    Raises:
+        ValueError: when base is different from 2 (binary) or 10 (decimal).
+
+    Examples:
+        >>> assert humanize_bytes(55) == "55 bytes"
+        >>> assert humanize_bytes(1024) == "1.000 KiB"
+        >>> assert humanize_bytes(1000, base=10) == "1.000 kB"
+        >>> assert humanize_bytes(1000000000) == '953.674 MiB'
+        >>> assert humanize_bytes(1000000000, base=10) == '1.000 GB'
+        >>> assert humanize_bytes(1073741824) == '1.000 GiB'
+        >>> assert humanize_bytes(1024**5 - 1, precision=0) == '1024 TiB'
+    """
+
+----
+
+The first line shall be a short summary of the functionality ended by a period or question mark. The rest, more detailed information, shall go after a blank line that separates it from the summary line.
+
+You can use the following sections:
+
+- *Args:* a list of the parameter names with a short description and possibly defaults values.
+- *Returns:* or *Yields:* describe the returns value(s) their content and type. This section can be ommitted when the docstring starts with the word 'Returns' or 'Yields", or when the function doesn't return anything (None).
+- *Raises:* a list of the Exceptions that might be raised by this function.
+- *Examples:* provide some simple examples and their possible outcome.
+
+=== What needs to go into the docstring and what not?
+
+The docstring shall contain all information that the user of the function, method, class or module needs to use it. The _user_ in this case can be a developer or a normal user of a Python function. Try to adapt the type and detail of the information in the docstring accordingly.
+
+Do not describe _how_ the functionality is implemented, instead describe _what_ functionality is provided and how it can be used.
+
+=== Where will the docstring show up?
+
+We will provide an API documentation that contains all docstrings of all classes, functions, methods and modules that are part of the CGSE. If you are using a Python IDE, use the available functionality to visualize the docstring information of a function. For PyCharm e.g. this is the 'F1' key when the cursor is on the function name.
+
+If you are in the IPython REPL, you can type the function name followed by q question mark:
+
+----
+In [2]: humanize_bytes?
+Signature: humanize_bytes(n: int, base: Union[int, str] = 2, precision: int = 3) -> str
+Docstring:
+Represents the size `n` in human readable form, i.e. as byte, KiB, MiB, GiB, ...
+
+Please note that, by default, I use the IEC standard (International Engineering Consortium)
+which is in `base=2` (binary), i.e. 1024 bytes = 1.0 KiB. If you need SI units (International
+System of Units), you need to specify `base=10` (decimal), i.e. 1000 bytes = 1.0 kB.
+
+Args:
+    n (int): number of byte
+    base (int, str): binary (2) or decimal (10)
+    precision (int): the number of decimal places [default=3]
+Returns:
+    a human readable size, like 512 byte or 2.300 TiB
+Raises:
+    ValueError when base is different from 2 (binary) or 10 (decimal).
+
+Examples:
+assert humanize_bytes(55) == "55 bytes"
+assert humanize_bytes(1024) == "1.000 KiB"
+assert humanize_bytes(1000, base=10) == "1.000 kB"
+assert humanize_bytes(1000000000) == '953.674 MiB'
+assert humanize_bytes(1000000000, base=10) == '1.000 GB'
+assert humanize_bytes(1073741824) == '1.000 GiB'
+assert humanize_bytes(1024**5 - 1, precision=0) == '1024 TiB'
+File:      ~/Documents/PyCharmProjects/plato-common-egse/src/egse/bits.py
+Type:      function
+
+In [3]:
+----

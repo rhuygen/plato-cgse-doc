@@ -1,6 +1,6 @@
 = Common–EGSE : Developer Manual
 Rik Huygen, Sara Regibo
-Version 1.10, 06/03/2024
+Version 1.12, 08/10/2024
 :organization: KU Leuven
 :doc-nr: PLATO-KUL-PL-MAN-0003
 :doctype: book
@@ -82,6 +82,8 @@ include::log-manager.adoc[]
 include::confman.adoc[]
 
 include::storage-manager.adoc[]
+
+include::data-dumper.adoc[]
 
 include::procman.adoc[]
 

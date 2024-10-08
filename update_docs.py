@@ -59,7 +59,7 @@ rich.print(textwrap.dedent(
     At this point, you should fix the links for the documents in the `index.html` files: 
     
     * Remove the `../../` for all docs in the top-level `__index__.html`, i.e. 10 replacements.
-    * Replace `../../` with `../` for all the docs in the  `__index__.html` of the `docs` folder.  
+    * Replace `../../` with `../` for all the docs in the  `__index__.html` of the `docs` folder, i.e. 11 replacements.  
     
     Eventually, I will automate this in this script.
     """
